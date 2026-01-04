@@ -12,6 +12,8 @@ public abstract class AbstractNode<S, T> {
 
     public int hash;
 
+    public AbstractNode<S, T> next;
+
     public AbstractNode(S key, T value) {
         this.key = key;
         this.value = value;

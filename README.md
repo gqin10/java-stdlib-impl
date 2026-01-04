@@ -10,7 +10,7 @@ This repository contains custom implementations of common Java data structures a
 | Java Class | Implemented Class | Status | Documentation |
 | - | - | - | - |
 | `java.util.HashMap` | `com.javaimpl.collections.hashmap.MyHashMap` | ✅ | [ReadMe](src/main/java/com/javaimpl/collections/hashmap/README.md) |
-| `java.util.LinkedHashMap` | | ⬜ | |
+| `java.util.LinkedHashMap` | `com.javaimpl.collections.linkedhashmap.MyLinkedHashMap` | ✅ | [ReadMe](src/main/java/com/javaimpl/collections/linkedhashmap/README.md) |
 | `java.util.TreeMap` | | ⬜ | |
 | `java.util.concurrent.ConcurrentHashMap` | | ⬜ | |
 | `java.util.ArrayList` | `com.javaimpl.collections.arraylist.MyArrayList` | ✅ | [ReadMe](src/main/java/com/javaimpl/collections/arraylist/README.md) |

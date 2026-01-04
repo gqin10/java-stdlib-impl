@@ -23,7 +23,7 @@ public class MyHashMap<S, T> {
 
     private static final int MAXIMUM_CAPACITY = 1 << 30; // maximum positive int
 
-    private float loadFactor = DEFAULT_LOAD_FACTOR;
+    private float loadFactor;
 
     private int threshold = 0;
 
@@ -32,6 +32,16 @@ public class MyHashMap<S, T> {
     private int size = 0;
 
     private AbstractNode<S, T>[] list;
+
+    public MyHashMap() {
+        this.capacity = DEFAULT_LENGTH;
+        loadFactor = DEFAULT_LOAD_FACTOR;
+    }
+
+    public MyHashMap(int initialCapacity, float loadFactor) {
+        this.capacity = initialCapacity;
+        this.loadFactor = loadFactor;
+    }
 
     public T put(S key, T value) {
         if (list == null) {
@@ -43,17 +53,19 @@ public class MyHashMap<S, T> {
             resize();
         }
         AbstractNode<S, T> head = list[bin];
-        AbstractNode<S, T> newEntry = new ListNode<>(key, value);
         if (head != null) {
             int binCount = 0;  // to calculate number of items in this bin
-            if (head instanceof ListNode) {
-                ListNode<S, T> prevEntry = null;
-                ListNode<S, T> currEntry = (ListNode<S, T>) head;
+            if (head instanceof HashMapTreeNode<S, T>) {
+                ((HashMapTreeNode<S, T>) head).put(key, value);
+            } else if (head instanceof ListNode) {
+                AbstractNode<S, T> prevEntry = null;
+                AbstractNode<S, T> currEntry = head;
                 while (currEntry != null) {
                     binCount++;
                     if (currEntry.key.equals(key)) {
                         // update value if key exists
                         currEntry.value = value;
+                        afterNodeAccess(currEntry);
                         return currEntry.value;
                     } else {
                         prevEntry = currEntry;
@@ -61,19 +73,17 @@ public class MyHashMap<S, T> {
                     }
                 }
                 // add new node if key does not exist
-                prevEntry.next = (ListNode) newEntry;
+                prevEntry.next = newNode(key, value);
                 if (binCount > TREEIFY_THRESHOLD - 1) {
                     treeifyBin(bin);
                 }
-            } else if (head instanceof HashMapTreeNode<S, T>) {
-                ((HashMapTreeNode<S, T>) head).put(key, value);
             }
         } else {
             // set new node as head if bin is empty
-            list[bin] = newEntry;
+            list[bin] = newNode(key, value);
         }
         size++;
-        return newEntry.value;
+        return null;
     }
 
     public T remove(S key) {
@@ -89,16 +99,17 @@ public class MyHashMap<S, T> {
                 if (currEntry.key.equals(key)) {
                     if (prevEntry == null) {
                         // update bin's head to second node
-                        list[bin] = ((ListNode<S, T>) currEntry).next;
+                        list[bin] = currEntry.next;
                     } else {
                         // link prev node to next node
-                        ((ListNode<S, T>) prevEntry).next = ((ListNode<S, T>) currEntry).next;
+                        prevEntry.next = currEntry.next;
                     }
                     size--;
+                    afterNodeRemoval(currEntry);
                     return currEntry.value;
                 } else {
                     prevEntry = currEntry;
-                    currEntry = ((ListNode<S, T>) currEntry).next;
+                    currEntry = currEntry.next;
                 }
             } else {
                 // remove from tree
@@ -108,26 +119,31 @@ public class MyHashMap<S, T> {
     }
 
     public T get(S key) {
+        AbstractNode<S, T> node = getNode(key);
+        return node != null ? node.value : null;
+    }
+
+    protected AbstractNode<S, T> getNode(S key) {
         int bin = getBin(key);
         AbstractNode<S, T> currEntry = list[bin]; // get the head of bin
         while (currEntry != null) {
-            if (currEntry instanceof ListNode) {
-                if (currEntry.key.equals(key)) {
-                    return currEntry.value;
-                }
-                currEntry = ((ListNode<S, T>) currEntry).next;
-            } else if (currEntry instanceof AbstractTreeNode) {
+            if (currEntry instanceof AbstractTreeNode) {
                 HashMapTreeNode<S, T> currTreeNode = (HashMapTreeNode<S, T>) currEntry;
-                while(currTreeNode != null)  {
-                    if(currTreeNode.key.equals(key)) {
-                        return currTreeNode.value;
+                while (currTreeNode != null) {
+                    if (currTreeNode.key.equals(key)) {
+                        return currTreeNode;
                     }
-                    if(hash(key) <= currTreeNode.hash) {
+                    if (hash(key) <= currTreeNode.hash) {
                         currTreeNode = currTreeNode.left;
                     } else {
                         currTreeNode = currTreeNode.right;
                     }
                 }
+            } else if (currEntry instanceof ListNode) {
+                if (currEntry.key.equals(key)) {
+                    return currEntry;
+                }
+                currEntry = currEntry.next;
             }
         }
         return null;
@@ -135,6 +151,12 @@ public class MyHashMap<S, T> {
 
     public int size() {
         return size;
+    }
+
+    public void clear() {
+        list = null;
+        capacity = DEFAULT_LENGTH;
+        size = 0;
     }
 
     /**
@@ -152,9 +174,8 @@ public class MyHashMap<S, T> {
     private void resize() {
         if (list == null) {
             // to initialize list
-            capacity = DEFAULT_LENGTH;
-            list = new AbstractNode[DEFAULT_LENGTH];
-            threshold = (int) (loadFactor * DEFAULT_LENGTH);
+            list = new AbstractNode[capacity];
+            threshold = (int) (loadFactor * capacity);
         } else if (capacity < MAXIMUM_CAPACITY) {
             int prevCapacity = capacity;
             // double up capacity
@@ -165,18 +186,18 @@ public class MyHashMap<S, T> {
             threshold = capacity < MAXIMUM_CAPACITY && threshold < MAXIMUM_CAPACITY ? threshold : Integer.MAX_VALUE;
             for (int i = 0; i < prevCapacity; i++) {
                 AbstractNode<S, T> currNode = prevList[i];
-                if (currNode instanceof ListNode<S, T>) {
-                    splitAndRemap((ListNode<S, T>) currNode, capacity, i);
-                } else if (currNode instanceof AbstractTreeNode) {
+                if (currNode instanceof AbstractTreeNode) {
                     // TODO
+                } else if (currNode instanceof ListNode<S, T>) {
+                    splitAndRemap((ListNode<S, T>) currNode, capacity, i);
                 }
             }
             System.out.println(String.format("Resized from %s to %s", prevCapacity, capacity));
         }
     }
 
-    private void splitAndRemap(ListNode<S, T> node, int newCapacity, int binIndex) {
-        ListNode<S, T> lowHead = null, lowTail = null, highHead = null, highTail = null;
+    private void splitAndRemap(AbstractNode<S, T> node, int newCapacity, int binIndex) {
+        AbstractNode<S, T> lowHead = null, lowTail = null, highHead = null, highTail = null;
         while (node != null) {
             if ((hash(node.key) & (newCapacity >> 1)) == 0) {
                 if (lowHead == null) {
@@ -222,7 +243,7 @@ public class MyHashMap<S, T> {
 
     private HashMapTreeNode<S, T> convertToTreeNodeList(ListNode<S, T> head) {
         HashMapTreeNode<S, T> root = null;
-        ListNode<S, T> currNode = head;
+        AbstractNode<S, T> currNode = head;
         HashMapTreeNode<S, T> tailTreeNode = null;
         do {
             HashMapTreeNode<S, T> newTreeNode = new HashMapTreeNode<>(currNode.key, currNode.value);
@@ -242,5 +263,18 @@ public class MyHashMap<S, T> {
     private int getBin(S key) {
         // Use bitwise AND to force positive index (requires capacity to be power of 2)
         return hash(key) & (capacity - 1);
+    }
+
+    protected AbstractNode<S, T> newNode(S key, T value) {
+        return new ListNode<>(key, value);
+    }
+
+    protected void afterNodeInsertion(AbstractNode<S, T> node) {
+    }
+
+    protected void afterNodeAccess(AbstractNode<S, T> node) {
+    }
+
+    protected void afterNodeRemoval(AbstractNode<S, T> node) {
     }
 }

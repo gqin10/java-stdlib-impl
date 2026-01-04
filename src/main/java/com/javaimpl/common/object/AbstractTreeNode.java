@@ -1,11 +1,15 @@
 package com.javaimpl.common.object;
 
+import com.javaimpl.collections.linkedhashmap.MyLinkedHashMap;
+
 /**
+ * extends MyLinkedHashMap.LinkedHashMapNode so that TreeNode can be used for regular HashMap and LinkedHashMap
+ *
  * @param <S> class of key
  * @param <T> class of value
  * @param <U> concrete class that extends AbstractTreeNode
  */
-public abstract class AbstractTreeNode<S, T, U extends AbstractTreeNode<S, T, U>> extends AbstractNode<S, T> {
+public abstract class AbstractTreeNode<S, T, U extends AbstractTreeNode<S, T, U>> extends MyLinkedHashMap.LinkedHashMapNode<S, T> {
 
     public U left;
 
