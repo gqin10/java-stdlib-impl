@@ -13,7 +13,7 @@ public class MyHashMapTests {
         MyHashMap<String, String> hashMap = new MyHashMap<>();
         String result = hashMap.put("key", "value");
         assertEquals(1, hashMap.size());
-        assertEquals("value", result);
+        assertEquals(null, result);
         assertEquals("value", hashMap.get("key"));
     }
 
