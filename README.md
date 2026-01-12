@@ -16,5 +16,5 @@ This repository contains custom implementations of common Java data structures a
 | `java.util.ArrayList` | `com.javaimpl.collections.arraylist.MyArrayList` | ✅ | [ReadMe](src/main/java/com/javaimpl/collections/arraylist/README.md) |
 | `java.util.LinkedList` | `com.javaimpl.collections.linkedlist.MyLinkedList` | ✅ | [ReadMe](src/main/java/com/javaimpl/collections/linkedlist/README.md) |
 | `java.util.Vector` | Not implemented as it is obselete | ❌ | [ReadMe](src/main/java/com/javaimpl/collections/vector/README.md) |
-| `java.util.HashSet` | | ⬜ | |
+| `java.util.HashSet` | `com.javaimpl.collections.hashset.MyHashSet` | ✅ | [ReadMe](src/main/java/com/javaimpl/collections/hashset/README.md) |
 
