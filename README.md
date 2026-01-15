@@ -12,7 +12,7 @@ This repository contains custom implementations of common Java data structures a
 | `java.util.HashMap` | `com.javaimpl.collections.hashmap.MyHashMap` | ✅ | [ReadMe](src/main/java/com/javaimpl/collections/hashmap/README.md) |
 | `java.util.LinkedHashMap` | `com.javaimpl.collections.linkedhashmap.MyLinkedHashMap` | ✅ | [ReadMe](src/main/java/com/javaimpl/collections/linkedhashmap/README.md) |
 | `java.util.TreeMap` | `com.javaimpl.collections.treemap.MyTreeMap` | ✅ | [ReadMe](src/main/java/com/javaimpl/collections/treemap/README.md) |
-| `java.util.concurrent.ConcurrentHashMap` | | ⬜ | |
+| `java.util.concurrent.ConcurrentHashMap` | Not implemented due to complexity in simulate concurrency | ❌ | [ReadMe](src/main/java/com/javaimpl/collections/concurrenthashmap/README.md) |
 | `java.util.ArrayList` | `com.javaimpl.collections.arraylist.MyArrayList` | ✅ | [ReadMe](src/main/java/com/javaimpl/collections/arraylist/README.md) |
 | `java.util.LinkedList` | `com.javaimpl.collections.linkedlist.MyLinkedList` | ✅ | [ReadMe](src/main/java/com/javaimpl/collections/linkedlist/README.md) |
 | `java.util.Vector` | Not implemented as it is obselete | ❌ | [ReadMe](src/main/java/com/javaimpl/collections/vector/README.md) |
